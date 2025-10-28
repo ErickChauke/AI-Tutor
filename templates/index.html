@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}AI Tutor{% endblock %}
+{% block body %}
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="mx-auto">
+                <h1 class="navbar-brand mb-0 text-center">The Digital AI Tutor</h1>
+            </div>
+            <button id="themeToggle" class="btn btn-outline-light ms-2" type="button" aria-label="Toggle theme">
+                <span id="themeIcon" class="bi bi-moon"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarMenuLabel">AI Tutor Menu</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="d-flex flex-column flex-shrink-0"> 
+                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none"> 
+                    <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg> 
+                    <span class="fs-4">Sidebar</span> 
+                </a> 
+                <hr> 
+                <ul class="nav nav-pills flex-column mb-auto"> 
+                    <li class="nav-item"> 
+                        <a href="/" class="nav-link active" aria-current="page"> 
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true"><use xlink:href="#home"></use></svg>
+                            Home
+                        </a> 
+                    </li> 
+                    <li> 
+                        <a href="#" class="nav-link text-white"> 
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true"><use xlink:href="#speedometer2"></use></svg>
+                            Dashboard
+                        </a> 
+                    </li> 
+                    <li> 
+                        <a href="/calibration" class="nav-link text-white"> 
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true"><use xlink:href="#table"></use></svg>
+                            Eye tracking Calibration
+                        </a> 
+                    </li> 
+                    <li> 
+                        <a href="#" class="nav-link text-white"> 
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true"><use xlink:href="#grid"></use></svg>
+                            Community
+                        </a> 
+                    </li> 
+                    <li> 
+                        <a href="#" class="nav-link text-white"> 
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true"><use xlink:href="#people-circle"></use></svg>
+                            Help
+                        </a> 
+                    </li> 
+                </ul> 
+                <hr> 
+                <div class="dropdown"> 
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
+                        <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2"> 
+                        <strong>AI Tutor</strong> 
+                    </a> 
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow"> 
+                        <li><a class="dropdown-item" href="#">Settings</a></li> 
+                        <li><a class="dropdown-item" href="#">Profile</a></li> 
+                        <li><a class="dropdown-item" href="#">Billing</a></li>
+                        <li><hr class="dropdown-divider"></li> 
+                        <li><a class="dropdown-item" href="#">Sign out</a></li> 
+                    </ul> 
+                </div> 
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="container-fluid">
+        <div class="row" style="min-height:70vh;">
+            <aside class="col-lg-3 col-md-4 col-12 d-flex flex-column gap-2 p-3">
+                <div id="engagement-visuals" style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 45vh; margin-left: 2cm;">
+                    <!-- Hidden raw video (used for capture) -->
+                    <video id="webcam" width="300" height="225" autoplay muted style="display:none; visibility:hidden;"></video>
+                    <img id="processed-frame" width="300" height="225" style="border: 2px solid #ccc; border-radius: 8px; margin-bottom: 12px; display: none;" />
+                    <div id="gaze-angle" style="font-size: 0.95em; color: #ddd; margin-bottom: 8px; display: none;">Gaze Angle: --</div>
+                    <div id="engagement-status" style="font-size: 1.2em; font-weight: bold; color: #fff; background: #444; padding: 8px 16px; border-radius: 6px; margin-top: 8px;">Eye tracking off</div>
+                </div>
+            </aside>
+
+            <main class="col-lg-9 col-md-8 col-12 d-flex flex-column align-items-center py-4">
+                <div class="black-box d-flex align-items-center justify-content-center mb-3">
+                    <div id="fbx-container" style="width:100%;height:100%;"></div>
+                    <div id="fbx-loader-overlay" class="fbx-overlay">
+                        <div class="fbx-spinner" aria-hidden="true"></div>
+                    </div>
+                </div>
+                <form id="tts-form" class="w-100 d-flex justify-content-center" onsubmit="return false;">
+                    <input id="tts-input" type="text" class="form-control me-2" placeholder="Enter text..." style="max-width:400px;">
+                    <div class="d-flex align-items-center">
+                            <!-- Send/Speak circular button containing the send icon (left) -->
+                            <button id="tts-send-btn" type="button" class="btn btn-primary rounded-circle me-2" aria-label="Send text" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;padding:0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+                                        <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+                                    </svg>
+                            </button>
+
+                            <!-- Mic button (circular). Starts showing the mic icon (right) -->
+                            <button id="tts-mic-btn" type="button" class="btn btn-outline-light rounded-circle" aria-pressed="true" aria-label="Toggle microphone" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;padding:0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16">
+                                        <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5"/>
+                                        <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3"/>
+                                    </svg>
+                            </button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+{% endblock %}
+{% block scripts %}
+    <!-- Local JS modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js",
+            "three/": "https://cdn.jsdelivr.net/npm/three@0.159.0/"
+        }
+    }
+    </script>
+    <!-- Local JS modules -->
+    <script type="module">
+        import "{{ url_for('static', filename='js/fbx-viewer.js') }}";
+        import "{{ url_for('static', filename='js/script.js') }}";
+        import "{{ url_for('static', filename='js/gaze-client.js') }}";
+    </script>
+{% endblock %}
